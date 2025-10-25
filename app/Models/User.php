@@ -53,4 +53,7 @@ class User extends Authenticatable
     public function comments(){
         return $this->hasMany(Comment::class);
     }
+    public function projects(){
+        return $this->belongsToMany(Project::class)->withPivot(['role','joined_at'])->withTimestamps();
+    }
 }
