@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,9 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('tasks', TaskController::class);
+    Route::post('/comments/{task}',[CommentController::class,'store']);
+    Route::put('/comments/{id}',[CommentController::class,'update']);
+    Route::delete('/comments/{id}',[CommentController::class,'destroy']);
     Route::post('/tasks/{task}',[TaskController::class, 'toggleCompleted']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });

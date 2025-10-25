@@ -50,7 +50,7 @@ class User extends Authenticatable
     public function tasks(){
         return $this->hasMany(Task::class);
     }
-    public function comment(){
+    public function comments(){
         return $this->hasMany(Comment::class);
     }
 }

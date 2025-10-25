@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
+use Dom\Comment;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -17,9 +19,25 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Task $task)
     {
         //
+        $validated = $request->validate([
+            'content'=>'required|string'
+        ]);
+        if(!$task){
+            return response()->json([
+                'message'=>'task does not exist'
+            ],404);
+        }
+        $validated['user_id'] = $request->user()->id;
+        $comment = $task->comments()->create($validated);
+        return response()->json([
+            'status'=>'success',
+            'message'=>'task created successfully',
+            'data'=> $comment
+        ]);
+        
     }
 
     /**
@@ -35,14 +53,39 @@ class CommentController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $validated = $request->validate([
+            'content' => 'string'
+        ]);
         //
+        $comment = $request->user()->comments()->find($id);
+        if(!$comment){
+            return response()->json([
+                'message'=>'comment not found'
+            ],404);
+        }
+        $comment->update($validated);
+        return response()->json([
+            'status'=>'success',
+            'message'=>'comment modified successfully',
+            'data'=>$comment
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         //
+        $comment = $request->user()->comments()->find($id);
+        if(!$comment){
+            return response()->json([
+                'message'=>'comment not found'
+            ],404);
+        }
+        $comment->delete();
+        return response()->json([
+            'message'=>'Comment deleted successfully'
+        ]);
     }
 }

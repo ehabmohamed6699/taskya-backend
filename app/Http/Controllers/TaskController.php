@@ -46,12 +46,16 @@ class TaskController extends Controller
     {
         //
         $task = $request->user()->tasks()->find($id);
+        $comments = $task->comments()->paginate(15);
         if(!$task){
             return response()->json([
                 'message'=>'Task not found'
             ],404);
         }
-        return $task;
+        return response()->json([
+            'task'=>$task,
+            'comments'=>$comments
+        ]);
     }
 
     /**
