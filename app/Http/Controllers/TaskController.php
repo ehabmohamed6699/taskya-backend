@@ -42,9 +42,16 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
         //
+        $task = $request->user()->tasks()->find($id);
+        if(!$task){
+            return response()->json([
+                'message'=>'Task not found'
+            ],404);
+        }
+        return $task;
     }
 
     /**
@@ -52,14 +59,43 @@ class TaskController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $validated = $request->validate([
+            'title' => 'string|max:255',
+            'description' => 'string',
+            'priority' => 'integer|in:0,1,2',
+            'due_date' => 'date|after_or_equal:today'
+        ]);
         //
+        $task = $request->user()->tasks()->find($id);
+        if(!$task){
+            return response()->json([
+                'message'=>'Task not found'
+            ],404);
+        }
+        $task->update($validated);
+        return response()->json([
+            'status'=>'success',
+            'message'=>'task modified successfully',
+            'data'=>$task
+        ]);
     }
-
+    
     /**
      * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    */
+    public function destroy(Request $request, string $id)
     {
+        $task = $request->user()->tasks()->find($id);
+        if(!$task){
+            return response()->json([
+                'message'=>'Task not found'
+            ],404);
+        }
+        $task->delete();
+        return response()->json([
+            'message'=>'Task deleted successfully'
+        ]);
+        
         //
     }
 
