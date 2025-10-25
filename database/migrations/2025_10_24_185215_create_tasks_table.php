@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('completed')->default(false);
             $table->date('due_date');
-            $table->enum('priority',[0,1,2]);
+            $table->tinyInteger('priority')->default(0);
             $table->timestamps();
         });
     }

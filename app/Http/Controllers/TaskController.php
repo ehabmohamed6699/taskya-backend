@@ -28,7 +28,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'string',
-            'priority' => 'required|in:0,1,2',
+            'priority' => 'required|integer|in:0,1,2',
             'due_date' => 'required|date|after_or_equal:today'
         ]);
         $task = $request->user()->tasks()->create($validated);

@@ -18,10 +18,12 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($validated);
+        $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'status' => 'success',
             'message' => 'user created successfully',
-            'data' => $user
+            'data' => $user,
+            'token' => $token
         ]);
     }
 
