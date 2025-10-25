@@ -13,6 +13,8 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('tasks', TaskController::class);
     Route::apiResource('projects', ProjectController::class);
+    Route::post('/projects/{id}/add',[ProjectController::class,'addUser']);
+    Route::post('/projects/{id}/remove',[ProjectController::class,'removeUser']);
     Route::post('/comments/{task}',[CommentController::class,'store']);
     Route::put('/comments/{id}',[CommentController::class,'update']);
     Route::delete('/comments/{id}',[CommentController::class,'destroy']);

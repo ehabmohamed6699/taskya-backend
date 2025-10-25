@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -91,6 +92,69 @@ class ProjectController extends Controller
             $project->delete();
             return response()->json([
                 'message'=>'project deleted successfully'
+            ]);
+        }
+    }
+
+    public function addUser(Request $request, string $id){
+        $validated = $request->validate([
+            'email'=>'required|email|exists:users,email',
+            'role'=>'required|string|max:255|not_in:admin'
+        ]);
+        $project = $request->user()->projects()->with('users')->find($id);
+        if(!$project){
+            return response()->json([
+                'message'=>'project not found'
+            ],404);
+        }else if($project['pivot']['role'] !== 'admin'){
+            return response()->json([
+                'message'=>'this action is unauthorized'
+            ],401);
+        }else{
+            $user = User::where('email',$validated['email'])->first();
+            if(!$user){
+                return response()->json([
+                'message'=>'user not found'
+            ],404);
+            }
+            $project->users()->attach($user, [
+                'role'=>$validated['role'],
+                'joined_at'=>now()
+            ]);
+            $project->save();
+            return response()->json([
+                'status'=>'success',
+                'message'=>'user added successfully',
+                'data'=>$project
+            ]);
+        }
+    }
+    public function removeUser(Request $request, string $id){
+        $validated = $request->validate([
+            'email'=>'required|email|exists:users,email',
+        ]);
+        $project = $request->user()->projects()->with('users')->find($id);
+        if(!$project){
+            return response()->json([
+                'message'=>'project not found'
+            ],404);
+        }else if($project['pivot']['role'] !== 'admin'){
+            return response()->json([
+                'message'=>'this action is unauthorized'
+            ],401);
+        }else{
+            $user = User::where('email',$validated['email'])->first();
+            if(!$user){
+                return response()->json([
+                'message'=>'user not found'
+            ],404);
+            }
+            $project->users()->detach($user);
+            $project->save();
+            return response()->json([
+                'status'=>'success',
+                'message'=>'user removed successfully',
+                'data'=>$project
             ]);
         }
     }
