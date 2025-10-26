@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             // attributes
             $table->string('role');
-            $table->timestamp('joined_at');
             $table->timestamps();
+            $table->unique(['project_id', 'user_id']);
         });
     }
 

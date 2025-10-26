@@ -14,7 +14,7 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         //
-        $projects = $request->user()->projects()->with('users')->paginate(15);
+        $projects = $request->user()->projects()->paginate(15);
         return $projects;
     }
 
@@ -29,8 +29,7 @@ class ProjectController extends Controller
         ]);
         $project = Project::create($validated);
         $project->users()->attach($request->user(),[
-            'role'=>'admin',
-            'joined_at'=>now()
+            'role'=>'owner'
         ]);
         return response()->json([
             'status'=>'success',
@@ -45,7 +44,7 @@ class ProjectController extends Controller
     public function show(Request $request, string $id)
     {
         //
-        $project = $request->user()->projects()->with('users')->find($id);
+        $project = $request->user()->projects()->find($id);
         return $project;
     }
 
@@ -59,19 +58,23 @@ class ProjectController extends Controller
             'name' => 'nullable|string|max:255'
         ]);
 
-        $project = $request->user()->projects()->with('users')->find($id);
+        $project = $request->user()->projects()->find($id);
+        $currentUser = $request->user();
+        $currentRole = $project->users()
+            ->where('user_id', $currentUser->id)
+            ->first()
+            ->pivot
+            ->role ?? null;
         if(!$project){
             return response()->json([
                 'message'=>'project not found'
             ],404);
-        }else if($project['pivot']['role'] !== 'admin'){
-            return response()->json([
-                'message'=>'this action is unauthorized'
-            ],401);
-        }else{
-            $project->update($validated);
-            return $project;
+        }if (!roleCan($currentRole, 'update_project')) {
+            return response()->json(['message' => 'Not authorized to update project.'], 403);
         }
+        $project->update($validated);
+        return response()->json(['message' => 'Project updated successfully.']);
+        
     }
 
     /**
@@ -79,83 +82,22 @@ class ProjectController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        $project = $request->user()->projects()->with('users')->find($id);
+        $project = $request->user()->projects()->find($id);
+        $currentUser = $request->user();
+        $currentRole = $project->users()
+            ->where('user_id', $currentUser->id)
+            ->first()
+            ->pivot
+            ->role ?? null;
         if(!$project){
             return response()->json([
                 'message'=>'project not found'
             ],404);
-        }else if($project['pivot']['role'] !== 'admin'){
-            return response()->json([
-                'message'=>'this action is unauthorized'
-            ],401);
-        }else{
-            $project->delete();
-            return response()->json([
-                'message'=>'project deleted successfully'
-            ]);
+        }if (!roleCan($currentRole, 'delete_project')) {
+            return response()->json(['message' => 'Not authorized to delete project.'], 403);
         }
-    }
-
-    public function addUser(Request $request, string $id){
-        $validated = $request->validate([
-            'email'=>'required|email|exists:users,email',
-            'role'=>'required|string|max:255|not_in:admin'
-        ]);
-        $project = $request->user()->projects()->with('users')->find($id);
-        if(!$project){
-            return response()->json([
-                'message'=>'project not found'
-            ],404);
-        }else if($project['pivot']['role'] !== 'admin'){
-            return response()->json([
-                'message'=>'this action is unauthorized'
-            ],401);
-        }else{
-            $user = User::where('email',$validated['email'])->first();
-            if(!$user){
-                return response()->json([
-                'message'=>'user not found'
-            ],404);
-            }
-            $project->users()->attach($user, [
-                'role'=>$validated['role'],
-                'joined_at'=>now()
-            ]);
-            $project->save();
-            return response()->json([
-                'status'=>'success',
-                'message'=>'user added successfully',
-                'data'=>$project
-            ]);
-        }
-    }
-    public function removeUser(Request $request, string $id){
-        $validated = $request->validate([
-            'email'=>'required|email|exists:users,email',
-        ]);
-        $project = $request->user()->projects()->with('users')->find($id);
-        if(!$project){
-            return response()->json([
-                'message'=>'project not found'
-            ],404);
-        }else if($project['pivot']['role'] !== 'admin'){
-            return response()->json([
-                'message'=>'this action is unauthorized'
-            ],401);
-        }else{
-            $user = User::where('email',$validated['email'])->first();
-            if(!$user){
-                return response()->json([
-                'message'=>'user not found'
-            ],404);
-            }
-            $project->users()->detach($user);
-            $project->save();
-            return response()->json([
-                'status'=>'success',
-                'message'=>'user removed successfully',
-                'data'=>$project
-            ]);
-        }
+        $project->delete();
+        return response()->json(['message' => 'Project deleted successfully.']);
+        
     }
 }
