@@ -12,6 +12,9 @@ class Project extends Model
     public function users(){
         return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps();
     }
+    public function tasks(){
+        return $this->hasMany(Task::class);
+    }
 
     public function hasPermission(User $user, string $action): bool
     {
