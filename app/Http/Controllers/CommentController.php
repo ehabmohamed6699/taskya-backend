@@ -30,11 +30,16 @@ class CommentController extends Controller
                 'message'=>'task does not exist'
             ],404);
         }
+        if($task->user() !== $request->user()){
+            return response()->json([
+                'message'=>'this action is unauthorized'
+            ],403);
+        }
         $validated['user_id'] = $request->user()->id;
         $comment = $task->comments()->create($validated);
         return response()->json([
             'status'=>'success',
-            'message'=>'task created successfully',
+            'message'=>'Comment created successfully',
             'data'=> $comment
         ]);
         

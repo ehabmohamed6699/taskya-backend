@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ProjectCommentsController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectTasksController;
@@ -24,6 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/projects/{project}/tasks', [ProjectTasksController::class, 'addTask']);
     Route::put('/projects/{project}/tasks/{id}', [ProjectTasksController::class, 'editTask']);
     Route::delete('/projects/{project}/tasks/{id}', [ProjectTasksController::class, 'deleteTask']);
+    Route::post('/projects/{project}/comments/{id}', [ProjectCommentsController::class, 'store']);
+    Route::put('/projects/{project}/comments/{comment}', [ProjectCommentsController::class, 'update']);
+    Route::delete('/projects/{project}/comments/{comment}', [ProjectCommentsController::class, 'destroy']);
     Route::post('/comments/{task}',[CommentController::class,'store']);
     Route::put('/comments/{id}',[CommentController::class,'update']);
     Route::delete('/comments/{id}',[CommentController::class,'destroy']);
