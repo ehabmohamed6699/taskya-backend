@@ -31,7 +31,7 @@ class ProjectCommentsController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $task = $project->tasks()->find($id);
         if(!$task){
@@ -45,7 +45,7 @@ class ProjectCommentsController extends Controller
         ->pivot
         ->role ?? null;
         if (!roleCan($currentRole, 'add_comment')) {
-            return response()->json(['message' => 'Not authorized to add comments.'], 403);
+            return response()->json(['message' => 'Not authorized to add comments.'], 401);
         }
         $validated['user_id'] = $request->user()->id;
         $comment = $task->comments()->create($validated);
@@ -78,7 +78,7 @@ class ProjectCommentsController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $currentRole = $project->users()
         ->where('user_id', $currentUser->id)
@@ -86,10 +86,10 @@ class ProjectCommentsController extends Controller
         ->pivot
         ->role ?? null;
         if (!roleCan($currentRole, 'edit_comment')) {
-            return response()->json(['message' => 'Not authorized to edit comments.'], 403);
+            return response()->json(['message' => 'Not authorized to edit comments.'], 401);
         }
         if(!$comment->user === $currentUser){
-            return response()->json(['message' => 'Only authorized to edit your comments.'], 403);
+            return response()->json(['message' => 'Only authorized to edit your comments.'], 401);
             
         }
         $comment->update($validated);
@@ -110,7 +110,7 @@ class ProjectCommentsController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $currentRole = $project->users()
         ->where('user_id', $currentUser->id)
@@ -118,10 +118,10 @@ class ProjectCommentsController extends Controller
         ->pivot
         ->role ?? null;
         if (!roleCan($currentRole, 'edit_comment')) {
-            return response()->json(['message' => 'Not authorized to delete comments.'], 403);
+            return response()->json(['message' => 'Not authorized to delete comments.'], 401);
         }
         if(!$comment->user === $currentUser){
-            return response()->json(['message' => 'Only authorized to delete your comments.'], 403);
+            return response()->json(['message' => 'Only authorized to delete your comments.'], 401);
             
         }
 

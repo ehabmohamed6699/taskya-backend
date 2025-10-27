@@ -70,7 +70,7 @@ class ProjectController extends Controller
                 'message'=>'project not found'
             ],404);
         }if (!roleCan($currentRole, 'update_project')) {
-            return response()->json(['message' => 'Not authorized to update project.'], 403);
+            return response()->json(['message' => 'Not authorized to update project.'], 401);
         }
         $project->update($validated);
         return response()->json(['message' => 'Project updated successfully.']);
@@ -94,7 +94,7 @@ class ProjectController extends Controller
                 'message'=>'project not found'
             ],404);
         }if (!roleCan($currentRole, 'delete_project')) {
-            return response()->json(['message' => 'Not authorized to delete project.'], 403);
+            return response()->json(['message' => 'Not authorized to delete project.'], 401);
         }
         $project->delete();
         return response()->json(['message' => 'Project deleted successfully.']);

@@ -30,7 +30,7 @@ class ProjectMemberController extends Controller
             ->pivot
             ->role ?? null;
         if (!roleCan($currentRole, 'add_member')) {
-            return response()->json(['message' => 'Not authorized to add members.'], 403);
+            return response()->json(['message' => 'Not authorized to add members.'], 401);
         }
         $newUser = User::where('email', $request->email)->first();
 
@@ -58,7 +58,7 @@ class ProjectMemberController extends Controller
             ->role ?? null;
 
         if (!roleCan($currentRole, 'change_role')) {
-            return response()->json(['message' => 'Not authorized to change roles.'], 403);
+            return response()->json(['message' => 'Not authorized to change roles.'], 401);
         }
 
         $targetMember = $project->users()->where('user_id', $user->id)->first();
@@ -85,7 +85,7 @@ class ProjectMemberController extends Controller
             ->role ?? null;
 
         if (!roleCan($currentRole, 'remove_member')) {
-            return response()->json(['message' => 'Not authorized to remove members.'], 403);
+            return response()->json(['message' => 'Not authorized to remove members.'], 401);
         }
 
         $targetMember = $project->users()->where('user_id', $user->id)->first();

@@ -14,7 +14,7 @@ class ProjectTasksController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         return response()->json($project->tasks);
     }
@@ -29,7 +29,7 @@ class ProjectTasksController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $currentRole = $project->users()
             ->where('user_id', $currentUser->id)
@@ -37,7 +37,7 @@ class ProjectTasksController extends Controller
             ->pivot
             ->role ?? null;
         if (!roleCan($currentRole, 'create_task')) {
-            return response()->json(['message' => 'Not authorized to add tasks.'], 403);
+            return response()->json(['message' => 'Not authorized to add tasks.'], 401);
         }
         $task = $project->tasks()->create([
             ...$validated,
@@ -55,7 +55,7 @@ class ProjectTasksController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $task = $project->tasks()->find($id);
         if(!$task){
@@ -82,7 +82,7 @@ class ProjectTasksController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $currentRole = $project->users()
         ->where('user_id', $currentUser->id)
@@ -90,7 +90,7 @@ class ProjectTasksController extends Controller
         ->pivot
         ->role ?? null;
         if (!roleCan($currentRole, 'edit_task')) {
-            return response()->json(['message' => 'Not authorized to edit tasks.'], 403);
+            return response()->json(['message' => 'Not authorized to edit tasks.'], 401);
         }
         $task = $project->tasks()->find($id);
         if(!$task){
@@ -99,7 +99,7 @@ class ProjectTasksController extends Controller
             ],404);
         }
         if(!$task->user === $currentUser){
-            return response()->json(['message' => 'Only authorized to edit your tasks.'], 403);
+            return response()->json(['message' => 'Only authorized to edit your tasks.'], 401);
             
         }
         $task->update($validated);
@@ -115,7 +115,7 @@ class ProjectTasksController extends Controller
         if(!$project->users->contains($currentUser)){
             return response()->json([
                 'message'=>'This action is unauthorized'
-            ],403);
+            ],401);
         }
         $currentRole = $project->users()
         ->where('user_id', $currentUser->id)
@@ -123,7 +123,7 @@ class ProjectTasksController extends Controller
         ->pivot
         ->role ?? null;
         if (!roleCan($currentRole, 'delete_task')) {
-            return response()->json(['message' => 'Not authorized to delete tasks.'], 403);
+            return response()->json(['message' => 'Not authorized to delete tasks.'], 401);
         }
         $task = $project->tasks()->find($id);
         if(!$task){
@@ -132,7 +132,7 @@ class ProjectTasksController extends Controller
             ],404);
         }
         if(!$task->user === $currentUser){
-            return response()->json(['message' => 'Only authorized to delete your tasks.'], 403);
+            return response()->json(['message' => 'Only authorized to delete your tasks.'], 401);
             
         }
         $task->delete();

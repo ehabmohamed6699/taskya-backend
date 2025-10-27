@@ -13,7 +13,7 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = $request->user()->tasks();
+        $tasks = $request->user()->tasks()->whereNull('project_id');
         //
         return response()->json([
             'data' => $tasks->paginate(15)
@@ -33,9 +33,9 @@ class TaskController extends Controller
         ]);
         $task = $request->user()->tasks()->create($validated);
         return response()->json([
-            'status'=>'success',
-            'message'=>'task created successfully',
-            'data'=>$task
+            'status' => 'success',
+            'message' => 'task created successfully',
+            'data' => $task
         ]);
     }
 
@@ -45,16 +45,16 @@ class TaskController extends Controller
     public function show(Request $request, string $id)
     {
         //
-        $task = $request->user()->tasks()->find($id);
-        $comments = $task->comments()->paginate(15);
-        if(!$task){
+        $task = $request->user()->tasks()->whereNull('project_id')->find($id);
+        if (!$task) {
             return response()->json([
-                'message'=>'Task not found'
-            ],404);
+                'message' => 'Task not found'
+            ], 404);
         }
+        $comments = $task->comments()->paginate(15);
         return response()->json([
-            'task'=>$task,
-            'comments'=>$comments
+            'task' => $task,
+            'comments' => $comments
         ]);
     }
 
@@ -70,40 +70,41 @@ class TaskController extends Controller
             'due_date' => 'date|after_or_equal:today'
         ]);
         //
-        $task = $request->user()->tasks()->find($id);
-        if(!$task){
+        $task = $request->user()->tasks()->whereNull('project_id')->find($id);
+        if (!$task) {
             return response()->json([
-                'message'=>'Task not found'
-            ],404);
+                'message' => 'Task not found'
+            ], 404);
         }
         $task->update($validated);
         return response()->json([
-            'status'=>'success',
-            'message'=>'task modified successfully',
-            'data'=>$task
+            'status' => 'success',
+            'message' => 'task modified successfully',
+            'data' => $task
         ]);
     }
-    
+
     /**
      * Remove the specified resource from storage.
-    */
+     */
     public function destroy(Request $request, string $id)
     {
-        $task = $request->user()->tasks()->find($id);
-        if(!$task){
+        $task = $request->user()->tasks()->whereNull('project_id')->find($id);
+        if (!$task) {
             return response()->json([
-                'message'=>'Task not found'
-            ],404);
+                'message' => 'Task not found'
+            ], 404);
         }
         $task->delete();
         return response()->json([
-            'message'=>'Task deleted successfully'
+            'message' => 'Task deleted successfully'
         ]);
-        
+
         //
     }
 
-    public function toggleCompleted(Request $request, Task $task){
+    public function toggleCompleted(Request $request, Task $task)
+    {
         $task['completed'] = !$task['completed'];
         $task->save();
         return $task;
