@@ -98,7 +98,7 @@ class ProjectTasksController extends Controller
                 'message'=>'Task not found'
             ],404);
         }
-        if(!$task->user === $currentUser){
+        if($task->user !== $currentUser){
             return response()->json(['message' => 'Only authorized to edit your tasks.'], 401);
             
         }
@@ -131,7 +131,7 @@ class ProjectTasksController extends Controller
                 'message'=>'Task not found'
             ],404);
         }
-        if(!$task->user === $currentUser){
+        if($task->user !== $currentUser){
             return response()->json(['message' => 'Only authorized to delete your tasks.'], 401);
             
         }

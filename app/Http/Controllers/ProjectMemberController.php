@@ -9,8 +9,13 @@ use Illuminate\Http\Request;
 
 class ProjectMemberController extends Controller
 {
-    public function listMembers(Project $project)
+    public function listMembers(Request $request, Project $project)
     {
+        if(!$request->user()->projects->contains($project)){
+            return response()->json([
+                'message' => 'project not found'
+            ],404);
+        }
         $members = $project->users()
             ->select('users.id', 'users.name', 'users.email', 'project_user.role')
             ->get();
@@ -30,7 +35,7 @@ class ProjectMemberController extends Controller
             ->pivot
             ->role ?? null;
         if (!roleCan($currentRole, 'add_member')) {
-            return response()->json(['message' => 'Not authorized to add members.'], 401);
+            return response()->json(['message' => 'Not authorized to add members.', 'role'=>$currentRole], 401);
         }
         $newUser = User::where('email', $request->email)->first();
 

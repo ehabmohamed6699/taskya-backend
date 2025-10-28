@@ -30,14 +30,15 @@ class CommentController extends Controller
                 'message' => 'task does not exist'
             ], 404);
         }
-        if ($task->project()) {
+        if ($task->project) {
             return response()->json([
-                'message' => 'this action is not supported'
+                'message' => 'this action is not supported',
             ], 401);
         }
-        if ($task->user() !== $request->user()) {
+        if ($task->user->id !== $request->user()->id) {
             return response()->json([
-                'message' => 'this action is unauthorized'
+                'message' => 'this action is unauthorized',
+
             ], 401);
         }
         $validated['user_id'] = $request->user()->id;
@@ -72,10 +73,16 @@ class CommentController extends Controller
                 'message' => 'comment not found'
             ], 404);
         }
-        if ($comment->task->project()) {
+        if ($comment->task->project) {
             return response()->json([
                 'message' => 'this action is not supported'
             ], 403);
+        }
+        if ($comment->task->user->id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'this action is unauthorized',
+
+            ], 401);
         }
         $comment->update($validated);
         return response()->json([
@@ -97,10 +104,16 @@ class CommentController extends Controller
                 'message' => 'comment not found'
             ], 404);
         }
-        if ($comment->task->project()) {
+        if ($comment->task->project) {
             return response()->json([
                 'message' => 'this action is not supported'
             ], 403);
+        }
+        if ($comment->task->user->id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'this action is unauthorized',
+
+            ], 401);
         }
         $comment->delete();
         return response()->json([

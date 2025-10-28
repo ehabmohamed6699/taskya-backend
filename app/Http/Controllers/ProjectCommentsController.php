@@ -88,7 +88,7 @@ class ProjectCommentsController extends Controller
         if (!roleCan($currentRole, 'edit_comment')) {
             return response()->json(['message' => 'Not authorized to edit comments.'], 401);
         }
-        if(!$comment->user === $currentUser){
+        if($comment->user !== $currentUser){
             return response()->json(['message' => 'Only authorized to edit your comments.'], 401);
             
         }
@@ -120,7 +120,7 @@ class ProjectCommentsController extends Controller
         if (!roleCan($currentRole, 'edit_comment')) {
             return response()->json(['message' => 'Not authorized to delete comments.'], 401);
         }
-        if(!$comment->user === $currentUser){
+        if($comment->user !== $currentUser){
             return response()->json(['message' => 'Only authorized to delete your comments.'], 401);
             
         }

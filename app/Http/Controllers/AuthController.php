@@ -21,14 +21,16 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($validated);
-        $link = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
-        );
+        // $link = URL::temporarySignedRoute(
+        //     'verification.verify',
+        //     now()->addMinutes(60),
+        //     ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        // );
 
-        Log::info('Verification Link: '.$link);
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Log::info('Verification Link: '.$link);
+        // DELETE THIS LINE AS SOON AS TESTING IS OVER
+        $user->markEmailAsVerified();
+        // DELETE THIS LINE AS SOON AS TESTING IS OVER
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'status' => 'success',

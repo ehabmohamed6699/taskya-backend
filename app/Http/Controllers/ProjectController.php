@@ -45,26 +45,40 @@ class ProjectController extends Controller
     {
         //
         $project = $request->user()->projects()->find($id);
-        return $project;
+        if(!$project){
+            return response()->json([
+                'message' => 'project not found'
+            ],404);
+        }
+        $tasks = $project->tasks()->paginate(15);
+        return response()->json([
+            'project'=>$project,
+            'tasks'=>$tasks
+        ]);
     }
-
+    
     /**
      * Update the specified resource in storage.
-     */
+    */
     public function update(Request $request, string $id)
     {
         //
         $validated = $request->validate([
             'name' => 'nullable|string|max:255'
         ]);
-
+        
         $project = $request->user()->projects()->find($id);
+        if(!$project){
+            return response()->json([
+                'message' => 'project not found'
+            ],404);
+        }
         $currentUser = $request->user();
         $currentRole = $project->users()
-            ->where('user_id', $currentUser->id)
-            ->first()
-            ->pivot
-            ->role ?? null;
+        ->where('user_id', $currentUser->id)
+        ->first()
+        ->pivot
+        ->role ?? null;
         if(!$project){
             return response()->json([
                 'message'=>'project not found'
@@ -76,13 +90,18 @@ class ProjectController extends Controller
         return response()->json(['message' => 'Project updated successfully.']);
         
     }
-
+    
     /**
      * Remove the specified resource from storage.
-     */
+    */
     public function destroy(Request $request, string $id)
     {
         $project = $request->user()->projects()->find($id);
+        if(!$project){
+            return response()->json([
+                'message' => 'project not found'
+            ],404);
+        }
         $currentUser = $request->user();
         $currentRole = $project->users()
             ->where('user_id', $currentUser->id)
