@@ -29,7 +29,6 @@ class AuthController extends Controller
 
         // Log::info('Verification Link: '.$link);
         // DELETE THIS LINE AS SOON AS TESTING IS OVER
-        $user->markEmailAsVerified();
         // DELETE THIS LINE AS SOON AS TESTING IS OVER
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
