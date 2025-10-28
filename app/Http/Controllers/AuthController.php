@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -18,6 +21,14 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($validated);
+        $link = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
+
+        Log::info('Verification Link: '.$link);
+        $token = $user->createToken('auth_token')->plainTextToken;
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'status' => 'success',

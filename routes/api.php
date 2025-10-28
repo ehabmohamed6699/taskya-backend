@@ -7,13 +7,14 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectTasksController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\VerifyEmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum','verified'])->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
     Route::apiResource('tasks', TaskController::class);
     Route::apiResource('projects', ProjectController::class);
     Route::get('/projects/{project}/members', [ProjectMemberController::class, 'listMembers']);
@@ -36,3 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+// Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
+//     ->middleware(['signed'])
+//     ->name('verification.verify');
+
